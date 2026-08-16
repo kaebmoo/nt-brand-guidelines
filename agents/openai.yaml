@@ -1,0 +1,5 @@
+interface:
+  display_name: "NT Brand Guidelines"
+  short_description: "Style NT-branded presentation decks"
+  brand_color: "#FFD100"
+  default_prompt: "Use $nt-brand-guidelines to create an NT-branded PowerPoint deck."
