@@ -3,6 +3,23 @@
 Detailed specifications for each slide layout in the NT Presentation Template.
 All coordinates are in inches. Slide dimensions: 13.333" × 7.5" (LAYOUT_WIDE).
 
+## Contents
+
+- Layout 0: Title Slide
+- Layout 1: Custom Layout (Section Divider – Yellow)
+- Layout 2: 1_Custom Layout (Content with Right Text)
+- Layout 3: 2_Custom Layout (Image Left + Text Right)
+- Layout 4: 3_Custom Layout (Content + Right Image)
+- Layout 5: 4_Custom Layout (Empty/Flexible)
+- Layout 6: 5_Custom Layout (Multi-image Showcase)
+- Layout 7: 6_Custom Layout (Four-Column Cards)
+- Layout 8: 7_Custom Layout (Minimal with Accent Bar)
+- Layout 9: 9_Custom Layout (Yellow BG with White Header)
+- Layout 10: 10_Custom Layout (White Header + Yellow Body)
+- Layout 11: 8_Custom Layout (Closing Slide)
+- Common Footer Positioning
+- Content Area Safe Zones
+
 ---
 
 ## Layout 0: Title Slide

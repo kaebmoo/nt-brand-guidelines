@@ -17,9 +17,9 @@ Resolve bundled files relative to this skill directory. When scripting, set `NT_
 
 There are two ways to create NT-branded presentations:
 
-1. **Template-based editing** (recommended for speed): Use the bundled template at `assets/NT_Presentation_Template.pptx` as the source deck. In Codex, use the `Presentations` skill/template-following workflow: inspect the master/layout hierarchy, duplicate or reuse selected layouts, fill placeholders locally, and render every final slide for visual QA.
+1. **Template-based editing** (recommended for speed): Use the bundled template at `assets/NT_Presentation_Template.pptx` as the source deck: inspect the master/layout hierarchy, duplicate or reuse selected layouts, fill placeholders locally, and render every final slide for visual QA. In Claude, follow the pptx skill's editing workflow; in Codex, use the `Presentations` skill's template-following workflow.
 
-2. **Create from scratch** (for full control): Use Codex presentation tooling, preferably `@oai/artifact-tool` from the `Presentations` skill when available, with the brand specifications below. If working outside that workflow, translate these constants and layout rules to the local PPTX library.
+2. **Create from scratch** (for full control): Apply the brand specifications below with the platform's presentation tooling: PptxGenJS through the pptx skill in Claude, or `@oai/artifact-tool` from the `Presentations` skill in Codex. With any other PPTX library, translate these constants and layout rules to it.
 
 For detailed layout-by-layout specifications, read `references/layouts.md`.
 
@@ -52,7 +52,7 @@ Used alongside NT Yellow for storytelling and to add variety while staying in th
 | Role | PANTONE | HEX | CMYK |
 |------|---------|-----|------|
 | **Teal** | 7465 C | `#40C1AC` | 65, 0, 38, 0 |
-| **Dark Grey** | 425 C | `#545859` | 63, 41, 45, 33 |
+| **Dark Grey** | 425 C | `#545859` | 63, 51, 45, 33 |
 | **Brick Red** | 7625 C | `#E1523E` | 0, 80, 78, 0 |
 | **Brown** | 7587 C | `#924C2E` | 6, 70, 83, 38 |
 
@@ -95,7 +95,7 @@ The actual NT typeface files are bundled at:
 - `assets/fonts/NT_Bold.ttf` — internal font name `NT`, style `Bold`
 - `assets/fonts/NT_Regular.ttf` — internal font name `NT`, style `Regular`
 
-**To make these render correctly (not fall back) when generating or QA-rendering a .pptx in a Codex environment**, install them into the local font cache before creating slides or running visual QA:
+**To make these render correctly (not fall back) when generating or QA-rendering a .pptx in a sandboxed or fresh environment (Claude's container, Codex)**, install them into the local font cache before creating slides or running visual QA:
 
 ```bash
 mkdir -p ~/.fonts
@@ -111,7 +111,30 @@ slide.addText("Heading", { fontFace: "NT", bold: true });   // resolves to NT Bo
 slide.addText("Body copy", { fontFace: "NT", bold: false }); // resolves to NT Regular
 ```
 
-If the font isn't installed in the Codex environment (e.g. a fresh session where the install step was skipped), LibreOffice will substitute a fallback for QA preview purposes only — the fallback chain below still applies for that case, and for recipients opening the file on a machine without the NT font installed.
+If the font isn't installed in the environment (e.g. a fresh session where the install step was skipped), LibreOffice will substitute a fallback for QA preview purposes only — the fallback chain below still applies for that case, and for recipients opening the file on a machine without the NT font installed.
+
+### Effective Size — NT renders smaller than normal fonts at the same point size
+
+**Verified finding**: at an identical point size, text set in NT Bold/NT Regular reads visually smaller than text set in a normal font (Arial, Calibri, Helvetica). This is a real, measurable difference in the typeface's own metrics — not a rendering bug, not per-machine — so it applies every time NT is used and must be compensated for by setting NT text **larger** than you would size a normal font for the same visual weight.
+
+**Why**: how big text *looks* at a given point size is driven mainly by **x-height** (the height of lowercase letters like "n", "o", "x") relative to the font's em square — not the nominal point size alone. NT's x-height is meaningfully smaller, as a fraction of its em square, than Arial's or Calibri's, so `fontSize: 14` in NT visibly reads smaller than `fontSize: 14` in the fallback fonts.
+
+Measured directly from the bundled font files with `fontTools` (`OS/2.sxHeight` / `OS/2.sCapHeight`, normalized by `unitsPerEm`, cross-checked against glyph bounding boxes for `n`/`o`/`H`/`A`):
+
+| Font | x-height ratio | cap-height ratio |
+|------|-----------------|-------------------|
+| **NT Regular / NT Bold** | **0.376** | 0.485 |
+| Carlito (Calibri-compatible fallback) | 0.478 | 0.642 |
+| Liberation Sans (Arial-compatible fallback) | 0.528 | 0.688 |
+
+This confirms field-reported experience (NT sitting at ~0.375 vs. a normal font at ~0.51 on the same size scale) — the reported "normal font" number lines up with the Arial-compatible measurement above.
+
+**Compensation factor** — to make NT-set text look the same visual size as the same nominal point size would in a normal font, scale the point size up by:
+- **~1.27–1.32×** when matching against Calibri / Helvetica Neue Medium
+- **~1.36–1.42×** when matching against Arial
+- **~1.3–1.4× as a general-purpose multiplier** when the specific fallback doesn't matter
+
+**Practical rule**: whenever a source spec, a client's original deck, or a generic sizing convention gives a point size assumed for a normal font, multiply by **~1.3–1.4×** before applying it to NT Bold/NT Regular. Example: body text speced at 14pt in a normal font → set `fontSize: 18–19` in NT Regular to read as equivalent size. This applies to every element — titles, body, captions, chart/legend text, table cells — not just headline sizes. Treat the multiplier as a target, not an absolute: in tight/dense layouts (data tables, multi-column cards, legends) where full compensation would overflow the available space, it's fine to compensate partially rather than not at all — but never size NT at the same nominal point size as a normal-font spec and assume it will look the same, and always verify by rendering to PDF/PNG and eyeballing the actual result, especially at small sizes where rounding matters most.
 
 ### Font Families
 
@@ -123,14 +146,18 @@ If the font isn't installed in the Codex environment (e.g. a fresh session where
 
 ### Size Guidelines
 
-| Element | Size | Weight |
-|---------|------|--------|
-| Slide title | 28–36pt | NT Bold |
-| Section header / subtitle | 20–24pt | NT Bold |
-| Body text | 14–16pt | NT Regular |
-| Captions / footnotes | 10–12pt | NT Regular, color `#888888` |
-| Large stat callouts | 48–72pt | NT Bold |
-| Copyright footer | 8–10pt | NT Regular, color `#000000` |
+The **Nominal Size** column below is standard presentation sizing, as commonly used with a normal font (Arial/Calibri). The **NT-Compensated Size** column applies the ~1.3–1.4× factor from "Effective Size" above and is what to actually set when the text is in NT Bold/NT Regular.
+
+| Element | Nominal Size (normal font) | NT-Compensated Size | Weight |
+|---------|------|------|--------|
+| Slide title | 28–36pt | ~36–50pt | NT Bold |
+| Section header / subtitle | 20–24pt | ~26–34pt | NT Bold |
+| Body text | 14–16pt | ~18–22pt | NT Regular |
+| Captions / footnotes | 10–12pt | ~13–17pt | NT Regular, color `#888888` |
+| Large stat callouts | 48–72pt | ~62–101pt | NT Bold |
+| Copyright footer | 8–10pt | ~10–14pt | NT Regular, color `#000000` |
+
+In space-constrained layouts (dense tables, multi-column cards, small legends) the full compensated size may not fit — see the "Treat the multiplier as a target, not an absolute" note above. Prioritize fitting and legibility over hitting the top of the compensated range, but still size up from the nominal column rather than using it as-is.
 
 ### Font Application in JavaScript Presentation Code
 
@@ -151,7 +178,18 @@ const bodyTextOptions = { fontFace: FONT_NT, bold: false };
 
 Always use **LAYOUT_WIDE**: **13.333" × 7.5"** (widescreen)
 
-In Codex's `Presentations` workflow, use a wide 16:9 PowerPoint canvas matching 13.333" x 7.5". If using a library that exposes PowerPoint layout constants, choose `LAYOUT_WIDE`.
+Use a wide 16:9 PowerPoint canvas matching 13.333" x 7.5" in whichever tool builds the deck (in Codex, the `Presentations` workflow). If the library exposes PowerPoint layout constants, choose `LAYOUT_WIDE`:
+
+```javascript
+// PptxGenJS
+pres.layout = "LAYOUT_WIDE";  // 13.333" × 7.5"
+```
+
+```python
+# python-pptx (EMU values)
+prs.slide_width = 12192000   # 13.333 inches
+prs.slide_height = 6858000   # 7.5 inches
+```
 
 ---
 
@@ -159,7 +197,7 @@ In Codex's `Presentations` workflow, use a wide 16:9 PowerPoint canvas matching 
 
 ### Official Logo Lockups (bundled, real assets)
 
-Four official lockups are bundled at `assets/logos/`. All four use the same icon mark (`#FFD100` yellow bars) + `#545859` dark grey wordmark, on a transparent/white background — verified by direct pixel sampling of the files.
+Four official lockups are bundled at `assets/logos/`. All four use the same icon mark (`#FFD100` yellow bars) + `#545859` dark grey wordmark, on a transparent/white background. Pixel sampling confirms these exact values in `NT_1_v3.png`, `NT_2_v3.png` and `NT_4_v3.png`; `NT_3_v3.png` samples slightly off (`#FDD209` yellow, `#55595B` grey). Use it as it is; do not recolor it.
 
 | File | Size (px) | Contents | Use When |
 |------|-----------|----------|----------|
@@ -203,9 +241,9 @@ The NT brand identity's rounded pill/capsule shapes come directly from the NT ic
 | `v2_Single_Sign.png` | One tall bar/pill alone | Minimal accent marker, single visual anchor |
 | `v2_Dot_Sign.png` | One dot alone | Smallest accent marker, bullet-style marker |
 
-Pixel-sampled confirmation: the yellow in all four files is `#FFD100` (255, 209, 0) — matches the official brand hex exactly, no correction needed.
+Pixel sampling: the yellow in all four files is `#FDD209` (253, 210, 9), a near match to the official `#FFD100` rather than an exact one. Use the files as they are, and use `#FFD100` for any shape drawn in code.
 
-**Prefer inserting these real PNG files** (via the image APIs in Codex presentation tooling, or by duplicating a template slide/layout that already contains one) over hand-drawing approximate pill shapes — they're the actual brand asset, not a redrawn approximation.
+**Prefer inserting these real PNG files** (via the presentation tool's image API, such as `addImage` in PptxGenJS, or by duplicating a template slide/layout that already contains one) over hand-drawing approximate pill shapes — they're the actual brand asset, not a redrawn approximation.
 
 When hand-drawing pill shapes is still necessary (e.g. custom card containers, content backgrounds that aren't literally the icon mark):
 - **Decorative background elements**: Light yellow (`#FFD100` with transparency — 10% opacity minimum — or a lighter gradient tint) pill shapes on white backgrounds
@@ -223,6 +261,7 @@ const pillShape = {
     fill: { color: "FFD100" },
     radius: 0.5  // Large radius for pill effect
 };
+// PptxGenJS equivalent: slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, fill, rectRadius: 0.5 })
 ```
 
 ---
@@ -266,7 +305,7 @@ For complete placeholder positions and content mapping, read `references/layouts
 
 ## Applying NT Style When Creating from Scratch
 
-When not using the template, apply these standards in every slide created with Codex presentation tooling:
+When not using the template, apply these standards in every slide. The code uses PptxGenJS-style calls; translate them to the active presentation API:
 
 ```javascript
 // Use LAYOUT_WIDE / 13.333" x 7.5" and set the deck author to "National Telecom".
@@ -314,7 +353,7 @@ function addFooter(slide) {
 
 ## File Assets
 
-**Fonts** (`assets/fonts/`) — real NT typeface files; see Typography section for Codex font install steps
+**Fonts** (`assets/fonts/`) — real NT typeface files; see Typography section for font install steps
 - `NT_Bold.ttf` — family `NT`, style `Bold`
 - `NT_Regular.ttf` — family `NT`, style `Regular`
 
