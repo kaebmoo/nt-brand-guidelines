@@ -1,6 +1,6 @@
 ---
 name: nt-brand-guidelines
-description: Applies NT (National Telecom) official brand colors, typography, and layout standards to PowerPoint presentations. Use this skill whenever creating or styling slides for NT, including any mention of "NT template", "NT slides", "NT presentation", "NT style", "NT brand", "NT deck", or when the user asks to create presentation slides in the NT corporate format. Also trigger when editing an existing NT-branded presentation, or when a logo/icon/font for NT is needed. This skill ensures correct use of NT yellow (#FFD100, PANTONE 109C), the recommended secondary palette (teal, dark grey, brick red, brown), the real bundled NT Bold/NT Regular font files, the four official logo lockups, the "Vital Sign" icon family, LAYOUT_WIDE dimensions, proper logo placement, and the signature rounded pill-shape visual motif.
+description: Applies NT (National Telecom) official brand colors, typography, and layout standards to PowerPoint presentations and other NT-branded visuals such as dashboards, charts, and reports. Use this skill whenever creating or styling slides for NT, including any mention of "NT template", "NT slides", "NT presentation", "NT style", "NT brand", "NT deck", or when the user asks to create presentation slides in the NT corporate format. Also trigger when editing an existing NT-branded presentation, when choosing colors or fonts for an NT dashboard or chart, or when a logo/icon/font for NT is needed. This skill ensures correct use of NT yellow (#FFD100, PANTONE 109C), the recommended secondary palette (teal, dark grey, brick red, brown), the real bundled NT Bold/NT Regular font files, the four official logo lockups, the "Vital Sign" icon family, LAYOUT_WIDE dimensions, proper logo placement, and the signature rounded pill-shape visual motif.
 ---
 
 # NT (National Telecom) Brand Styling for Presentations
@@ -221,6 +221,17 @@ Until a proper reversed variant is provided:
 - **Copyright text**: Bottom-right corner — `© National Telecom All Rights Reserved`
 - **Logo on white bg slides**: Use the lockup matching the audience/formality per the table above
 - **Logo on yellow bg slides**: See "Known gap" above — use `NT_1_v3.png` and treat as a temporary workaround
+
+## Dashboards and Data Views
+
+The color, font, and prohibition rules above apply to dashboards, charts, and reports on any platform (Excel, HTML, Power BI, Databricks AI/BI), not only slides. When a generic dashboard-design guideline conflicts with this section, this section wins.
+
+- **Yellow placement:** keep NT Yellow #FFD100 visually dominant through the frame (header band, title bar, sidebar, section markers), not behind tables or charts. Also use it for interactive and selected states.
+- **Accent contrast:** #FFD100 on white or near-white is only ~1.4:1, below the 3:1 WCAG minimum for UI components. Active filters, tabs, and buttons must be a yellow fill with #000000 text (14.4:1), or pair the yellow with a #545859 or #000000 outline or indicator.
+- **Text and backgrounds:** text #000000 or #212121; backgrounds white #FFFFFF or NT Yellow. No dark mode.
+- **Chart palette:** NT Yellow plus Teal #40C1AC, Dark Grey #545859, Brick Red #E1523E, Brown #924C2E (5 colors). Do not place Teal and Brick Red adjacent; run a color-blindness simulation before finalizing.
+- **Do not use:** generic blue accents (including the common #2272B4 fallback) or any color outside the NT palette.
+- **Fonts:** family "NT" with bold on/off, scaled up ~1.3–1.4x versus Arial/Calibri sizing, with the fallback chain in the Typography section. If the platform cannot load a custom font, use the fallback chain.
 
 ### Prohibited Logo Usage
 
