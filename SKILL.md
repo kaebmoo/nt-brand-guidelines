@@ -387,9 +387,12 @@ function addFooter(slide) {
 - `NT_Presentation_Template.pptx` — official NT template, 12 layouts / 11 example slides, recolored to `#FFD100`. Use as the template source for the editing workflow.
 
 Embedded images within the template itself (older, approximate placeholders — prefer the real files above for new work):
+- `image1.png` — half-slide cityscape in a rounded shape (Layouts 4 and 5)
 - `image2.png` — small dark NT logo (125×50)
 - `image3.png` — full NT logo (482×196)
 - `image4.png` — decorative pill shapes with cityscape (978×738) for title slide
+- `image5.png` — yellow-tinted pill cityscape (Layout 6)
+- `image6.png` — grey pill cityscape (Layout 6)
 - `image7.jpeg` — cityscape background photo (2822×1650) for closing slide
 
 To extract images from the template itself, unzip the .pptx and find them in `ppt/media/`.
