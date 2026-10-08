@@ -110,6 +110,7 @@ After this, reference the font by its real family name `NT` (with `Bold`/`Regula
 slide.addText("Heading", { fontFace: "NT", bold: true });   // resolves to NT Bold
 slide.addText("Body copy", { fontFace: "NT", bold: false }); // resolves to NT Regular
 ```
+When filling template placeholders, explicitly set the font to family "NT" (the template's "NT Bold"/"NT Regular" face names do not resolve in LibreOffice). For Thai text, also set the complex-script (cs) typeface to "NT"; most libraries, including python-pptx's font.name, set only the Latin typeface.
 
 If the font isn't installed in the environment (e.g. a fresh session where the install step was skipped), LibreOffice will substitute a fallback for QA preview purposes only — the fallback chain below still applies for that case, and for recipients opening the file on a machine without the NT font installed.
 
@@ -221,17 +222,19 @@ Until a proper reversed variant is provided:
 - **Copyright text**: Bottom-right corner — `© National Telecom All Rights Reserved`
 - **Logo on white bg slides**: Use the lockup matching the audience/formality per the table above
 - **Logo on yellow bg slides**: See "Known gap" above — use `NT_1_v3.png` and treat as a temporary workaround
-
-## Dashboards and Data Views
-
-The color, font, and prohibition rules above apply to dashboards, charts, and reports on any platform (Excel, HTML, Power BI, Databricks AI/BI), not only slides. When a generic dashboard-design guideline conflicts with this section, this section wins.
-
 - **Yellow placement:** keep NT Yellow #FFD100 visually dominant through the frame (header band, title bar, sidebar, section markers), not behind tables or charts. Also use it for interactive and selected states.
 - **Accent contrast:** #FFD100 on white or near-white is only ~1.4:1, below the 3:1 WCAG minimum for UI components. Active filters, tabs, and buttons must be a yellow fill with #000000 text (14.4:1), or pair the yellow with a #545859 or #000000 outline or indicator.
 - **Text and backgrounds:** text #000000 or #212121; backgrounds white #FFFFFF or NT Yellow. No dark mode.
 - **Chart palette:** NT Yellow plus Teal #40C1AC, Dark Grey #545859, Brick Red #E1523E, Brown #924C2E (5 colors). Do not place Teal and Brick Red adjacent; run a color-blindness simulation before finalizing.
 - **Do not use:** generic blue accents (including the common #2272B4 fallback) or any color outside the NT palette.
 - **Fonts:** family "NT" with bold on/off, scaled up ~1.3–1.4x versus Arial/Calibri sizing, with the fallback chain in the Typography section. If the platform cannot load a custom font, use the fallback chain.
+
+## Dashboards and Data Views
+
+The color, font, and prohibition rules above apply to dashboards, charts, and reports on any platform (Excel, HTML, Power BI, Databricks AI/BI), not only slides. When a generic dashboard-design guideline conflicts with this section, this section wins.
+
+- **Native charts:** the template's theme accent colors are still Office defaults (accent1 #5B9BD5 blue). Always set chart series colors explicitly to the NT palette; never rely on theme defaults.
+--- 
 
 ### Prohibited Logo Usage
 
@@ -290,7 +293,7 @@ const pillShape = {
 
 1. **Title Slide** (Layout 0: "Title Slide") — White bg, decorative pill graphic left, NT logo center-right, title text bottom-right
 2. **Section Divider** (Layout 1: "Custom Layout") — Yellow bg (#FFD100), title text right side
-3. **Content Slides** (Layouts 2–9) — Various white/yellow layouts with content areas
+3. **Content Slides** (Layouts 2–4, 6–10; avoid Layout 5)
 4. **Closing Slide** (Layout 11: "8_Custom Layout") — Yellow bg with cityscape, NT logo + company info
 
 ### Available Layouts in Template
@@ -302,12 +305,12 @@ const pillShape = {
 | 2 | 1_Custom Layout | White | Content with right-side text |
 | 3 | 2_Custom Layout | White | Two-column: image left + text blocks right |
 | 4 | 3_Custom Layout | White | Text content with right-side cityscape image |
-| 5 | 4_Custom Layout | White | Empty with pill accent (minimal) |
-| 6 | 5_Custom Layout | White | Multi-image showcase (4 tall pills) |
+| 5 | 4_Custom Layout | White | Fixed four-item list with Latin filler text — do not use for new content (see layouts.md) |
+| 6 | 5_Custom Layout | White | Text left + fixed decorative pill images |
 | 7 | 6_Custom Layout | White | Four-column card layout (4 pill cards) |
 | 8 | 7_Custom Layout | White | Minimal with yellow accent bar top-left |
 | 9 | 9_Custom Layout | Yellow (#FFD100) | Yellow bg with white header banner |
-| 10 | 10_Custom Layout | White + Yellow | White header + yellow body |
+| 10 | 10_Custom Layout | White + Yellow | Yellow header band + white body (good for data-heavy slides) |
 | 11 | 8_Custom Layout | Yellow (#FFD100) | Closing slide with company info |
 
 For complete placeholder positions and content mapping, read `references/layouts.md`.
@@ -339,7 +342,7 @@ const FONT_NT = "NT";           // Family name from bundled NT_Bold/NT_Regular f
 function addFooter(slide) {
     // Copyright text (bottom-right)
     slide.addText("© National Telecom All Rights Reserved", {
-        x: 9.0, y: 7.05, w: 4.0, h: 0.35,
+        x: 8.66, y: 7.05, w: 4.0, h: 0.35,   // right edge 12.66", matches template
         fontSize: 8, fontFace: FONT_NT, bold: false, color: NT_BLACK,
         align: "right"
     });
