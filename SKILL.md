@@ -1,5 +1,5 @@
 ---
-name: nt-brand-guidelines
+name: "nt-brand-guidelines"
 description: Applies NT (National Telecom) official brand colors, typography, and layout standards to PowerPoint presentations and other NT-branded visuals such as dashboards, charts, and reports. Use this skill whenever creating or styling slides for NT, including any mention of "NT template", "NT slides", "NT presentation", "NT style", "NT brand", "NT deck", or when the user asks to create presentation slides in the NT corporate format. Also trigger when editing an existing NT-branded presentation, when choosing colors or fonts for an NT dashboard or chart, or when a logo/icon/font for NT is needed. This skill ensures correct use of NT yellow (#FFD100, PANTONE 109C), the recommended secondary palette (teal, dark grey, brick red, brown), the real bundled NT Bold/NT Regular font files, the four official logo lockups, the "Vital Sign" icon family, LAYOUT_WIDE dimensions, proper logo placement, and the signature rounded pill-shape visual motif.
 ---
 
@@ -110,6 +110,7 @@ After this, reference the font by its real family name `NT` (with `Bold`/`Regula
 slide.addText("Heading", { fontFace: "NT", bold: true });   // resolves to NT Bold
 slide.addText("Body copy", { fontFace: "NT", bold: false }); // resolves to NT Regular
 ```
+
 When filling template placeholders, explicitly set the font to family "NT" (the template's "NT Bold"/"NT Regular" face names do not resolve in LibreOffice). For Thai text, also set the complex-script (cs) typeface to "NT"; most libraries, including python-pptx's font.name, set only the Latin typeface.
 
 If the font isn't installed in the environment (e.g. a fresh session where the install step was skipped), LibreOffice will substitute a fallback for QA preview purposes only — the fallback chain below still applies for that case, and for recipients opening the file on a machine without the NT font installed.
@@ -249,7 +250,7 @@ Pixel sampling: the yellow in all four files is `#FDD209` (253, 210, 9), a near 
 When hand-drawing pill shapes is still necessary (e.g. custom card containers, content backgrounds that aren't literally the icon mark):
 - **Decorative background elements**: Light yellow (`#FFD100` with transparency — 10% opacity minimum — or a lighter gradient tint) pill shapes on white backgrounds
 - **Content containers**: Yellow pill shapes that can hold cityscape imagery or solid fills
-- **Card shapes**: Tall rounded rectangles used as content columns (see slide 7 / Layout 6)
+- **Card shapes**: Tall rounded rectangles used as content columns (see slide 7 / Layout 7)
 - **Accent elements**: Small yellow rounded bars used as visual markers
 
 In JavaScript presentation code, translate these geometry values to the active API:
@@ -280,7 +281,7 @@ const pillShape = {
 
 1. **Title Slide** (Layout 0: "Title Slide") — White bg, decorative pill graphic left, NT logo center-right, title text bottom-right
 2. **Section Divider** (Layout 1: "Custom Layout") — Yellow bg (#FFD100), title text right side
-3. **Content Slides** (Layouts 2–4, 6–10; avoid Layout 5)
+3. **Content Slides** (Layouts 2–4, 6–10; avoid Layout 5) — Various white/yellow layouts with content areas
 4. **Closing Slide** (Layout 11: "8_Custom Layout") — Yellow bg with cityscape, NT logo + company info
 
 ### Available Layouts in Template
@@ -338,6 +339,8 @@ function addFooter(slide) {
 }
 ```
 
+---
+
 ## Dashboards and Data Views
 
 The color, font, and prohibition rules in this skill apply to dashboards, charts, and reports on any platform (Excel, HTML, Power BI, Databricks AI/BI), not only slides. When a generic dashboard-design guideline conflicts with this section, this section wins.
@@ -350,7 +353,6 @@ The color, font, and prohibition rules in this skill apply to dashboards, charts
 - **Do not use:** generic blue accents (including the common #2272B4 fallback) or any color outside the NT palette.
 - **Fonts:** family "NT" with bold on/off, scaled up ~1.3–1.4x versus Arial/Calibri sizing, with the fallback chain in the Typography section. If the platform cannot load a custom font, use the fallback chain.
 
----
 ---
 
 ## Prohibited Elements
@@ -387,9 +389,9 @@ The color, font, and prohibition rules in this skill apply to dashboards, charts
 - `NT_Presentation_Template.pptx` — official NT template, 12 layouts / 11 example slides, recolored to `#FFD100`. Use as the template source for the editing workflow.
 
 Embedded images within the template itself (older, approximate placeholders — prefer the real files above for new work):
-- `image1.png` — half-slide cityscape in a rounded shape (Layouts 4 and 5)
 - `image2.png` — small dark NT logo (125×50)
 - `image3.png` — full NT logo (482×196)
+- `image1.png` — half-slide cityscape in a rounded shape (Layouts 4 and 5)
 - `image4.png` — decorative pill shapes with cityscape (978×738) for title slide
 - `image5.png` — yellow-tinted pill cityscape (Layout 6)
 - `image6.png` — grey pill cityscape (Layout 6)
